@@ -10,20 +10,26 @@ function Logger(logString: string) {
   };
 }
 
-function WithTemplate(template: string, hookId: string) {
-  return function (constructor: any) {
-    console.log('Rendering template');
-    const p = new constructor();
-    const hookEl = document.getElementById(hookId);
-    if (hookEl) {
-      hookEl.innerHTML = template;
-      hookEl!.querySelector('h1')!.textContent = p.name;
-    }
-  };
-}
+// function WithTemplate(template: string, hookId: string) {
+//   return function <T extends { new (...args: any[]): { name: string } }>(
+//     originalConstructor: any
+//   ) {
+//     return class extends originalConstructor {
+//       constructor(..._: any[]) {
+//         super();
+//         console.log('Rendering template');
+//         const hookEl = document.getElementById(hookId);
+//         if (hookEl) {
+//           hookEl.innerHTML = template;
+//           hookEl!.querySelector('h1')!.textContent = this.name;
+//         }
+//       }
+//     };
+//   };
+// }
 
 @Logger('Logging - person')
-@WithTemplate('<h1>My Person Object </h1>', 'app')
+// @WithTemplate('<h1>My Person Object </h1>', 'app')
 class Person {
   name = 'max';
   constructor() {
@@ -90,5 +96,36 @@ class Product {
   @Log3
   getPriceWithTax(@Log4 tax: number) {
     return this._price * (1 + tax);
+  }
+}
+
+function Autobinder(_: any, _2: string, descriptor: PropertyDescriptor) {
+  const originalMethod = descriptor.value;
+  const adjustedDescriptor: PropertyDescriptor = {
+    configurable: true,
+    enumerable: false,
+    get() {
+      const boundFn = originalMethod.bind(this);
+      return boundFn;
+    },
+  };
+  return adjustedDescriptor;
+}
+
+class Printer {
+  message = 'sunny';
+
+  @Autobinder
+  showMessage() {
+    console.log(this.message);
+  }
+}
+
+class Course {
+  title: string;
+  price: number;
+  constructor(t: string, p: number) {
+    this.title = t;
+    this.price = p;
   }
 }

@@ -17,17 +17,6 @@ function Logger(logString) {
         console.log(constructor);
     };
 }
-function WithTemplate(template, hookId) {
-    return function (constructor) {
-        console.log('Rendering template');
-        const p = new constructor();
-        const hookEl = document.getElementById(hookId);
-        if (hookEl) {
-            hookEl.innerHTML = template;
-            hookEl.querySelector('h1').textContent = p.name;
-        }
-    };
-}
 let Person = class Person {
     constructor() {
         this.name = 'max';
@@ -35,8 +24,7 @@ let Person = class Person {
     }
 };
 Person = __decorate([
-    Logger('Logging - person'),
-    WithTemplate('<h1>My Person Object </h1>', 'app')
+    Logger('Logging - person')
 ], Person);
 const pers = new Person();
 console.log(pers);
@@ -89,4 +77,33 @@ __decorate([
     Log3,
     __param(0, Log4)
 ], Product.prototype, "getPriceWithTax", null);
+function Autobinder(_, _2, descriptor) {
+    const originalMethod = descriptor.value;
+    const adjustedDescriptor = {
+        configurable: true,
+        enumerable: false,
+        get() {
+            const boundFn = originalMethod.bind(this);
+            return boundFn;
+        },
+    };
+    return adjustedDescriptor;
+}
+class Printer {
+    constructor() {
+        this.message = 'sunny';
+    }
+    showMessage() {
+        console.log(this.message);
+    }
+}
+__decorate([
+    Autobinder
+], Printer.prototype, "showMessage", null);
+class Course {
+    constructor(t, p) {
+        this.title = t;
+        this.price = p;
+    }
+}
 //# sourceMappingURL=app.js.map
