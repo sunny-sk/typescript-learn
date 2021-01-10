@@ -4,17 +4,22 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "",
-    "start": ""
+    "build": "webpack --config webpack.config.prod.js",
+    "start": "webpack-cli serve"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@webpack-cli/serve": "^1.2.1",
+    "clean-webpack-plugin": "^3.0.0",
     "ts-loader": "^8.0.14",
     "typescript": "^4.1.3",
     "webpack": "^5.12.2",
     "webpack-cli": "^4.3.1",
-    "webpack-dev-server": "^3.11.1"
+    "webpack-dev-server": "^3.7.1"
+  },
+  "dependencies": {
+    "axios": "^0.21.1"
   }
 }
