@@ -5,6 +5,35 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
+class ProjectState {
+    constructor() {
+        this.projects = [];
+        this.listeners = [];
+    }
+    static getInstance() {
+        if (this.instance) {
+            return this.instance;
+        }
+        this.instance = new ProjectState();
+        return this.instance;
+    }
+    addListener(listenerFn) {
+        this.listeners.push(listenerFn);
+        for (const listenerFn of this.listeners) {
+            listenerFn(this.projects.slice());
+        }
+    }
+    addProject(title, description, people) {
+        const newProject = {
+            id: Math.random().toString(),
+            title,
+            description,
+            people,
+        };
+        this.projects.push(newProject);
+    }
+}
+const projectState = ProjectState.getInstance();
 function autobind(_, _1, descriptor) {
     const originalMethod = descriptor.value;
     const adjustedDescriptor = {
@@ -44,13 +73,26 @@ function validate(validatableInput) {
 class ProjectList {
     constructor(type) {
         this.type = type;
+        this.assignedProjects = [];
         this.templateElement = document.getElementById('project-list');
         this.hostElement = document.getElementById('app');
         const importedNode = document.importNode(this.templateElement.content, true);
         this.element = importedNode.firstElementChild;
         this.element.id = `${this.type}-projects`;
+        projectState.addListener((projects) => {
+            this.assignedProjects = projects;
+            this.renderProjects();
+        });
         this.attach();
         this.renderContent();
+    }
+    renderProjects() {
+        const listEl = document.getElementById(`${this.type}-projects-list`);
+        for (const prjItems of this.assignedProjects) {
+            const el = document.createElement('li');
+            el.textContent = prjItems.title;
+            listEl.appendChild(el);
+        }
     }
     renderContent() {
         const listId = `${this.type}-projects-list`;
@@ -112,7 +154,7 @@ class ProjectInput {
         const userInput = this.getUserInput();
         if (Array.isArray(userInput)) {
             const [title, description, people] = userInput;
-            console.log(title, description, people);
+            projectState.addProject(title, description, people);
             this.clearInputs();
         }
     }
