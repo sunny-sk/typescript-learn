@@ -1,17 +1,13 @@
 import fs from 'fs';
-export abstract class CsvFileFeader<T> {
-  data: T[] = [];
-
+export class CsvFileFeader {
+  data: string[][] = [];
   constructor(public filename: string) {}
-  abstract mapRow(row: string[]): T;
-
   read(): void {
     this.data = fs
       .readFileSync(this.filename, {
         encoding: 'utf-8',
       })
       .split('\n')
-      .map((row: string): string[] => row.replace('\r', '').split(','))
-      .map(this.mapRow);
+      .map((row: string): string[] => row.replace('\r', '').split(','));
   }
 }
